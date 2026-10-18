@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'syaidan/Tugas1-publicAPi:latest'
+        DOCKER_IMAGE = 'syaidan/tugas1-publicapi:latest'
     }
 
     stages {
