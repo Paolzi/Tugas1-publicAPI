@@ -10,8 +10,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // Menggunakan --dns=8.8.8.8 untuk mengatasi kendala DNS transient / network di Windows/Jenkins
-                bat 'docker build --dns=8.8.8.8 -t syaidan/tugas1-publicapi:latest .'
+                // Menghapus flag --dns karena tidak didukung oleh buildx build
+                bat 'docker build -t syaidan/tugas1-publicapi:latest .'
             }
         }
 
