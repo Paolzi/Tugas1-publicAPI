@@ -25,7 +25,7 @@ WORKDIR /var/www/html
 COPY . .
 COPY --from=composer-vendor /app/vendor ./vendor
 
-# Berikan izin akses folder storage & bootstrap/cache agar Laravel tidak error permission
+# Berikan izin akses folder storage & bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
