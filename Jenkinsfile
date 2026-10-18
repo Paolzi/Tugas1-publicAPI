@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = 'syaidan/tugas1-publicapi:latest'
-    }
-
     stages {
         stage('Checkout SCM') {
             steps {
@@ -14,15 +10,16 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t ${DOCKER_IMAGE} ."
+                // Menggunakan --dns=8.8.8.8 untuk mengatasi kendala DNS transient / network di Windows/Jenkins
+                bat 'docker build --dns=8.8.8.8 -t syaidan/tugas1-publicapi:latest .'
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                    bat "docker login -u %USER% -p %PASS%"
-                    bat "docker push ${DOCKER_IMAGE}"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    bat 'docker push syaidan/tugas1-publicapi:latest'
                 }
             }
         }
