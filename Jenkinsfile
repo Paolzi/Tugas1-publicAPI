@@ -10,8 +10,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // Menghapus flag --dns karena tidak didukung oleh buildx build
-                bat 'docker build -t syaidan/tugas1-publicapi:latest .'
+                // Menggunakan --network=host agar container build memakai DNS host Windows
+                bat 'docker build --network=host -t syaidan/tugas1-publicapi:latest .'
             }
         }
 
