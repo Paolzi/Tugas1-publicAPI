@@ -7,8 +7,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Stage 2: Runtime Image menggunakan PHP 8.2 FPM Alpine
 FROM php:8.2-fpm-alpine
 
+# Set DNS resolver ke 8.8.8.8 secara permanen di container sebelum apk add
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf.tmp && mv /etc/resolv.conf.tmp /etc/resolv.conf
+
 # Install dependensi sistem & ekstensi PHP untuk Laravel / Database (MySQL/PostgreSQL)
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     curl \
     libpng-dev \
     libxml2-dev \
