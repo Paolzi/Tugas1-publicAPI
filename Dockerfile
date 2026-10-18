@@ -1,4 +1,14 @@
+# Stage 1: Build dependency menggunakan Composer
+FROM composer:latest AS composer-vendor
+WORKDIR /app
+COPY . .
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Stage 2: Runtime Image menggunakan PHP 8.2 FPM Alpine
 FROM php:8.2-fpm-alpine
+
+# Fix DNS issue inside Alpine container for apk add
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
 # Install dependensi sistem & ekstensi PHP untuk Laravel / Database (MySQL/PostgreSQL)
 RUN apk add --no-cache \
@@ -14,10 +24,16 @@ RUN apk add --no-cache \
 # Set direktori kerja
 WORKDIR /var/www/html
 
-# Copy file proyek Laravel
+# Copy file proyek dari direktori lokal dan vendor dari stage Composer
 COPY . .
+COPY --from=composer-vendor /app/vendor ./vendor
+
+# Berikan izin akses folder storage dan bootstrap/cache agar Laravel bisa menulis log & cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Exposure port
 EXPOSE 8000
 
+# Jalankan server Laravel
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
