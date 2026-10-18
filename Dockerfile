@@ -7,9 +7,6 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Stage 2: Runtime Image menggunakan PHP 8.2 FPM Alpine
 FROM php:8.2-fpm-alpine
 
-# Fix DNS issue inside Alpine container for apk add
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
-
 # Install dependensi sistem & ekstensi PHP untuk Laravel / Database (MySQL/PostgreSQL)
 RUN apk add --no-cache \
     curl \
@@ -24,11 +21,11 @@ RUN apk add --no-cache \
 # Set direktori kerja
 WORKDIR /var/www/html
 
-# Copy file proyek dari direktori lokal dan vendor dari stage Composer
+# Copy file proyek dan vendor dari stage Composer
 COPY . .
 COPY --from=composer-vendor /app/vendor ./vendor
 
-# Berikan izin akses folder storage dan bootstrap/cache agar Laravel bisa menulis log & cache
+# Berikan izin akses folder storage & bootstrap/cache agar Laravel tidak error permission
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
